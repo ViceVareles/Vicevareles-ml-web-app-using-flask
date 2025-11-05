@@ -1,6 +1,14 @@
 from __future__ import annotations
 
 import os
+from typing import List, Sequence, Tuple
+
+from flask import Flask, render_template, request
+
+from model_artifact import load_model as load_serialized_model
+
+app = Flask(__name__)
+
 import pickle
 from pathlib import Path
 from typing import List, Sequence, Tuple
@@ -27,6 +35,19 @@ FEATURE_LABELS: Sequence[Tuple[str, str]] = (
 )
 
 
+expected_features: int = len(FEATURE_LABELS)
+
+try:
+    model = load_serialized_model()
+    model_load_error: str | None = None
+    try:
+        expected_features = int(getattr(model, "n_features_in_", len(FEATURE_LABELS)))
+    except Exception:  # pragma: no cover - atributo inesperado
+        expected_features = len(FEATURE_LABELS)
+except Exception as exc:  # pragma: no cover - fallo temprano
+    model = None
+    model_load_error = str(exc)
+    expected_features = len(FEATURE_LABELS)
 def load_model(model_path: Path) -> object:
     """Carga el modelo entrenado desde disco."""
 
@@ -61,6 +82,11 @@ def _parse_features(form_data: "ImmutableMultiDict[str, str]") -> List[float]:
             raise ValueError(
                 f"El valor de '{field}' debe ser numérico."
             ) from exc
+    if len(features) != expected_features:
+        raise ValueError(
+            "El modelo fue entrenado con "
+            f"{expected_features} características y recibió {len(features)}."
+        )
     return features
 
 
@@ -71,6 +97,7 @@ def index():
 
     if request.method == "POST":
         if model is None:
+            error_message = model_load_error or (
             error_message = (
                 "El modelo no se pudo cargar, por lo que no es posible realizar predicciones."
             )
