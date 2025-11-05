@@ -1,5 +1,7 @@
 # 🩺 App de Predicción de Diabetes con Flask
 
+https://vicevareles-ml-web-app-using-flask.onrender.com
+
 Esta aplicación web utiliza un modelo de regresión LassoCV entrenado previamente para estimar la progresión de la diabetes a
 partir de variables clínicas. La interfaz está construida con Flask y Bootstrap 5, y permite ingresar los valores clínicos de un
 paciente para obtener una predicción inmediata.
@@ -46,5 +48,16 @@ Ese comando verifica que no existan errores de sintaxis en el código Python ni 
 > **Importante:** El modelo se distribuye incrustado en el código, sin dependencias externas como scikit-learn. Los coeficientes del `StandardScaler` y del `LassoCV` se reimplementaron en una clase ligera de Python, de modo que no necesitas archivos binarios ni bibliotecas científicas para ejecutar las predicciones.
 
 El predictor espera exactamente los diez campos clínicos que muestra el formulario (edad, sexo, IMC, presión arterial y los seis indicadores bioquímicos). Asegúrate de que cada uno sea numérico para obtener una predicción válida.
+
+
+
+   ```bash
+   python app.py
+   ```
+
+5. Abre tu navegador en `http://127.0.0.1:5000` para comenzar a realizar predicciones.
+
+> **Importante:** El archivo `lasso_cv_diabetes_model.pkl` debe permanecer en la raíz del proyecto para que la aplicación pueda
+> cargar el modelo entrenado.
 
 
