@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import os
+import pickle
+from pathlib import Path
 from typing import List, Sequence, Tuple
 
 from flask import Flask, render_template, request
 
-from model_artifact import load_model as load_serialized_model
-
 app = Flask(__name__)
 
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "lasso_cv_diabetes_model.pkl"
 
 # Lista de campos esperados y sus etiquetas para el formulario.
 FEATURE_LABELS: Sequence[Tuple[str, str]] = (
@@ -25,19 +27,24 @@ FEATURE_LABELS: Sequence[Tuple[str, str]] = (
 )
 
 
-expected_features: int = len(FEATURE_LABELS)
+def load_model(model_path: Path) -> object:
+    """Carga el modelo entrenado desde disco."""
+
+    if not model_path.exists():
+        raise FileNotFoundError(
+            f"No se encontró el archivo del modelo en '{model_path}'."
+        )
+
+    with model_path.open("rb") as model_file:
+        return pickle.load(model_file)
+
 
 try:
-    model = load_serialized_model()
+    model = load_model(MODEL_PATH)
     model_load_error: str | None = None
-    try:
-        expected_features = int(getattr(model, "n_features_in_", len(FEATURE_LABELS)))
-    except Exception:  # pragma: no cover - atributo inesperado
-        expected_features = len(FEATURE_LABELS)
 except Exception as exc:  # pragma: no cover - fallo temprano
     model = None
     model_load_error = str(exc)
-    expected_features = len(FEATURE_LABELS)
 
 
 def _parse_features(form_data: "ImmutableMultiDict[str, str]") -> List[float]:
@@ -54,11 +61,6 @@ def _parse_features(form_data: "ImmutableMultiDict[str, str]") -> List[float]:
             raise ValueError(
                 f"El valor de '{field}' debe ser numérico."
             ) from exc
-    if len(features) != expected_features:
-        raise ValueError(
-            "El modelo fue entrenado con "
-            f"{expected_features} características y recibió {len(features)}."
-        )
     return features
 
 

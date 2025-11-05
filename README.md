@@ -27,24 +27,7 @@ paciente para obtener una predicción inmediata.
 
 5. Abre tu navegador en `http://127.0.0.1:5000` para comenzar a realizar predicciones.
 
-## 🧪 Cómo probar la aplicación paso a paso
-
-1. **Arranca el servidor** con `python app.py`; verás en la terminal un mensaje similar a `Running on http://127.0.0.1:5000/`.
-2. **Abre el navegador** y navega a `http://127.0.0.1:5000/` (si estás en un entorno remoto, utiliza el reenvío de puertos correspondiente).
-3. **Introduce valores de ejemplo** en el formulario y pulsa **Predict** para ver la respuesta del modelo.
-4. **Prueba validaciones**: si dejas un campo vacío o introduces un texto no numérico, la página mostrará un mensaje de error sin detener el servidor.
-5. **Detén la aplicación** con `Ctrl+C` en la terminal cuando termines.
-
-Si prefieres ejecutar una comprobación rápida sin abrir el navegador, puedes compilar los archivos con:
-
-```bash
-python -m compileall app.py templates/index.html
-```
-
-Ese comando verifica que no existan errores de sintaxis en el código Python ni en la plantilla principal.
-
-> **Importante:** El modelo se distribuye incrustado en el código como una cadena Base64, por lo que no necesitas archivos binarios adicionales.
->
-> El pipeline serializado combina un `StandardScaler` y un regresor `LassoCV`, entrenado para recibir exactamente los diez campos clínicos del formulario.
+> **Importante:** El archivo `lasso_cv_diabetes_model.pkl` debe permanecer en la raíz del proyecto para que la aplicación pueda
+> cargar el modelo entrenado.
 
 
