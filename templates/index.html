@@ -11,22 +11,24 @@
     <div class="container py-5">
         <h1 class="text-center text-primary mb-4">🩺 Evaluación de Riesgo de Diabetes</h1>
 
+        {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
+        {% endif %}
+
         <form method="POST" class="row g-3">
-            {% for field, label in [
-                ('age', 'Edad'),
-                ('sex', 'Sexo (1 = Hombre, 0 = Mujer)'),
-                ('bmi', 'Índice de Masa Corporal (IMC)'),
-                ('bp', 'Presión Arterial'),
-                ('s1', 'Colesterol Total'),
-                ('s2', 'Colesterol LDL'),
-                ('s3', 'Colesterol HDL'),
-                ('s4', 'Triglicéridos'),
-                ('s5', 'Nivel de Glucosa'),
-                ('s6', 'Nivel de Insulina')
-            ] %}
+            {% for field, label in feature_labels %}
                 <div class="col-md-6">
                     <label class="form-label">{{ label }}</label>
-                    <input type="number" step="any" class="form-control" name="{{ field }}" required>
+                    <input
+                        type="number"
+                        step="any"
+                        class="form-control"
+                        name="{{ field }}"
+                        value="{{ request.form.get(field, '') }}"
+                        required
+                    >
                 </div>
             {% endfor %}
 
@@ -35,8 +37,8 @@
             </div>
         </form>
 
-        {% if prediction is not none %}
-        <div class="alert alert-info text-center mt-4">
+        {% if prediction is not none and not error_message %}
+        <div class="alert alert-info text-center mt-4" role="status">
             <h4>Resultado de la Predicción</h4>
             <p><strong>Valor estimado de progresión de diabetes:</strong> {{ prediction | round(2) }}</p>
         </div>
